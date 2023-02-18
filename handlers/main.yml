@@ -1,0 +1,6 @@
+---
+- name: Start Minecraft service
+  become: true
+  service:
+    name: minecraft
+    state: started

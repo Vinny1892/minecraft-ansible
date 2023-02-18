@@ -1,0 +1,53 @@
+---
+- name: Install Java
+  become: true
+  apt:
+    name: openjdk-8-jre-headless
+    update_cache: true
+
+- name: Debug
+  ansible.builtin.debug:
+    msg:
+      - "{{ teste }}"
+
+- name: Delete content & directory
+  file:
+    state: absent
+    path: /opt/minecraft
+
+- name: "Check if path exists"
+  stat:
+    path: "/etc/systemd/system/minecraft.service"
+  register: result
+
+- name: Stop Minecraft Service
+  when: result.stat.exists
+  systemd:
+    state: stopped
+    name: minecraft
+  
+
+- name: Creates directory
+  file:
+    path: /opt/minecraft
+    state: directory
+
+- name: Creating a eula file
+  copy:
+    dest: "/opt/minecraft/eula.txt"
+    content: |
+      eula=true
+
+- name: Download and extract Minecraft server
+  become: true
+  get_url:
+    url: "https://launcher.mojang.com/v1/objects/{{ minecraft_version }}/server.jar"
+    dest: /opt/minecraft/server.jar
+    mode: 'u=rwx,g=rx,o=rx'
+
+- name: Create Minecraft server systemd service
+  become: true
+  template:
+    src: minecraft.service.j2
+    dest: /etc/systemd/system/minecraft.service
+  notify: Start Minecraft service
