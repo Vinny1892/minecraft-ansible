@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "minecraft-ansible"
+version = "0.1.0"
+description = ""
+authors = ["DiegoBulhoes <diegobulhoesm@gmail.com>"]
+readme = "README.md"
+packages = [{include = "minecraft_ansible"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ansible = "^7.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+molecule = "^4.0.4"
+black = "^23.1.0"
+isort = "^5.12.0"
+docker = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -5,11 +5,6 @@
     name: openjdk-8-jre-headless
     update_cache: true
 
-- name: Debug
-  ansible.builtin.debug:
-    msg:
-      - "{{ teste }}"
-
 - name: Delete content & directory
   file:
     state: absent
@@ -25,7 +20,6 @@
   systemd:
     state: stopped
     name: minecraft
-  
 
 - name: Creates directory
   file:
@@ -41,9 +35,9 @@
 - name: Download and extract Minecraft server
   become: true
   get_url:
-    url: "https://launcher.mojang.com/v1/objects/{{ minecraft_version }}/server.jar"
+    url: "https://launcher.mojang.com/v1/objects/4d1826eebac84847c71a77f9349cc22afd0cf0a1/server.jar"
     dest: /opt/minecraft/server.jar
-    mode: 'u=rwx,g=rx,o=rx'
+    mode: "u=rwx,g=rx,o=rx"
 
 - name: Create Minecraft server systemd service
   become: true

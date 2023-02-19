@@ -1,0 +1,11 @@
+all:
+  hosts:
+    host1:
+      ansible_user: "{{ ssh_user }}"
+      ansible_password: "{{ ssh_pass }}"
+      ansible_host: "{{ ssh_host }}"
+      ansible_become: true
+
+group_vars:
+  all:
+    - production_vars.yml

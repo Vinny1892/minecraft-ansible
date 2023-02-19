@@ -1,8 +1,0 @@
----
-- name: Install and configure Minecraft server
-  hosts: minecraft
-  become: true
-  tasks:
-    - include_tasks: tasks/main.yml
-  handlers:
-    - import_tasks: handlers/main.yml

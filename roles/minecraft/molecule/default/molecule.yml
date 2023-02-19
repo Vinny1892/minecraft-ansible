@@ -1,0 +1,31 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: minecraft
+    image: ubuntu
+    privileged: true
+    pre_build_image: true
+    registry: false
+    tty: true
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      roles_path: ../../../
+  inventory:
+    group_vars:
+      all:
+        ansible_connection: docker
+        ansible_user: root
+
+verifier:
+  name: testinfra
+  directory: molecule/default/tests/
+  env:
+    PYTHONWARNINGS: "ignore:DEPRECATION"
+
+scenario:
+  name: default

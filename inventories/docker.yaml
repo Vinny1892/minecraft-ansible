@@ -1,0 +1,6 @@
+---
+plugin: community.docker.docker_containers
+host: "unix://var/run/docker.sock"
+keyed_groups:
+  - prefix: docker
+    key: 'docker_name'
