@@ -2,8 +2,38 @@
 - name: Install Java
   become: true
   apt:
-    name: openjdk-8-jre-headless
+    name: openjdk-17-jre-headless
     update_cache: true
+
+- name: Set Java 17 as default
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /usr/lib/jvm/java-1.17.0-openjdk-amd64/bin/java
+    state: present
+
+- name: Creates minecraft backup map directory
+  file:
+    path: /opt/minecraft_maps
+    state: directory
+
+- name: "Check map folder is exists"
+  stat:
+    path: "/opt/minecraft/world"
+  register: map_folder_exists
+
+- name: "Check map folder is exists"
+  debug:
+    var: map_folder_exists
+
+
+- name: "Backup minecraft map folder"
+  when: map_folder_exists.stat.exists
+  copy:
+    src: "/opt/minecraft/world"
+    dest: "/opt/minecraft_maps/world-{{ ansible_date_time.iso8601 }}"
+    remote_src: true
+    directory_mode:
 
 - name: Delete content & directory
   file:
@@ -35,13 +65,15 @@
 - name: Download and extract Minecraft server
   become: true
   get_url:
-    url: "https://launcher.mojang.com/v1/objects/4d1826eebac84847c71a77f9349cc22afd0cf0a1/server.jar"
+    url: "https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar"
     dest: /opt/minecraft/server.jar
     mode: "u=rwx,g=rx,o=rx"
+  notify:  Start Minecraft service
 
 - name: Create Minecraft server systemd service
+  when: not result.stat.exists
   become: true
   template:
     src: minecraft.service.j2
     dest: /etc/systemd/system/minecraft.service
-  notify: Start Minecraft service
+  notify:  Start Minecraft service
