@@ -41,3 +41,8 @@ sh: ## Show password	 node
 install_production: ## Install production
 	ansible-playbook -i inventories/production.yaml playbook.yaml -e @production_vars.yml
 
+.PHONY:  test
+test: ## test 
+	cd roles/minecraft/ && \
+	molecule test && \
+	cd ../..

@@ -12,10 +12,9 @@ ansible = "^7.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
-molecule = "^4.0.4"
+molecule = {extras = ["docker"], version = "^4.0.4"}
 black = "^23.1.0"
 isort = "^5.12.0"
-docker = "^6.0.1"
 
 [build-system]
 requires = ["poetry-core"]

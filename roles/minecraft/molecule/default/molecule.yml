@@ -1,31 +1,23 @@
----
+dependency:
+  name: galaxy
+
 driver:
   name: docker
 
 platforms:
   - name: minecraft
-    image: ubuntu
+    image: ubuntu:22.04
     privileged: true
-    pre_build_image: true
-    registry: false
-    tty: true
-
+    dockerfile: roles/minecraft/molecule/default/Dockerfile
+    # command: /lib/systemd/systemd status minecraft.service
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
-  config_options:
-    defaults:
-      roles_path: ../../../
   inventory:
     group_vars:
       all:
-        ansible_connection: docker
-        ansible_user: root
-
-verifier:
-  name: testinfra
-  directory: molecule/default/tests/
-  env:
-    PYTHONWARNINGS: "ignore:DEPRECATION"
+        ansible_python_interpreter: /usr/bin/python3
 
 scenario:
   name: default
