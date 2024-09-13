@@ -1,0 +1,19 @@
+plugin: amazon.aws.aws_ec2
+aws_profile: "{{ lookup('envs', 'AWS_PROFILE') | default('dev-profile', true) }}"
+regions:
+  - us-east-1
+
+use_contrib_script_compatible_sanitization: True
+use_contrib_script_compatible_ec2_tag_keys: True
+hostnames:
+  - instance-id
+include_filters:
+  - tag:Project:
+      - 'minecraft'
+leading_separator: false
+keyed_groups:
+  - key: tags.Role
+
+compose:
+  ansible_connection: '"community.aws.aws_ssm"'
+  ansible_user: '"ssm-user"'

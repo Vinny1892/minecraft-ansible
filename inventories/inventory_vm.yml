@@ -1,0 +1,12 @@
+all:
+  vars_files:
+    - env_vm.yml
+  children:
+    vm:
+      hosts:
+        "{{ host }}":
+          ansible_ssh_user: "{{ user }}"
+          ansible_ssh_private_key_file: "{{ path_ssh_private_key }}"
+          ansible_sudo_pass: "{{ password_user_sudo }}"
+
+

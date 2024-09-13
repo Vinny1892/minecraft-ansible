@@ -1,1 +1,5 @@
-inventory.ini
+envs/env_aws.yml
+envs/env_vm.yml
+
+
+.idea/*

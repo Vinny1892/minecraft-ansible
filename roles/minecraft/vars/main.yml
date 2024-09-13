@@ -1,4 +1,5 @@
 ---
 # vars file for minecraft
 minecraft_version: "1.19.3"
-teste: seila
+minecraft_server_url_for_download: ""
+jdk_version: "21"

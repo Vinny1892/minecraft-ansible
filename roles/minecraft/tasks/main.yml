@@ -2,14 +2,14 @@
 - name: Install Java
   become: true
   apt:
-    name: openjdk-17-jre-headless
+    name: "openjdk-{{ jdk_version }}-jre-headless"
     update_cache: true
 
-- name: Set Java 17 as default
+- name: "Set Java {{ jdk_version }}  as default"
   alternatives:
     name: java
     link: /usr/bin/java
-    path: /usr/lib/jvm/java-1.17.0-openjdk-amd64/bin/java
+    path: "/usr/lib/jvm/java-1.{{ jdk_version }}.0-openjdk-amd64/bin/java"
     state: present
 
 - name: Creates minecraft backup map directory
@@ -43,10 +43,10 @@
 - name: "Check if path exists"
   stat:
     path: "/etc/systemd/system/minecraft.service"
-  register: result
+  register: service_exists
 
 - name: Stop Minecraft Service
-  when: result.stat.exists
+  when: service_exists.stat.exists
   systemd:
     state: stopped
     name: minecraft
@@ -55,6 +55,21 @@
   file:
     path: /opt/minecraft
     state: directory
+
+- name: "Check map folder is exists"
+  stat:
+    path: "{{ path_map_folder }}"
+  register: map_folder_local_exists
+
+## Add map exists, if path for passed in ansible
+- name: Copy map to server
+  when: map_folder_exists.stat.exists
+  copy:
+    src: "{{ path_map_folder }}"
+    dest: "/opt/minecraft/world"
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Creating a eula file
   copy:
@@ -65,7 +80,7 @@
 - name: Download and extract Minecraft server
   become: true
   get_url:
-    url: "https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar"
+    url: "{{ minecraft_server_url_for_download  }}"
     dest: /opt/minecraft/server.jar
     mode: "u=rwx,g=rx,o=rx"
   notify:  Start Minecraft service
