@@ -1,5 +1,6 @@
 ---
 - name: Install and configure Minecraft server
+  hosts: all
   roles:
     - ../roles/minecraft
-  become: false
+  become: true

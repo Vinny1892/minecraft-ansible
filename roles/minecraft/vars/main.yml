@@ -1,5 +1,6 @@
 ---
 # vars file for minecraft
-minecraft_version: "1.19.3"
-minecraft_server_url_for_download: ""
+minecraft_server_url_for_download: "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar"
 jdk_version: "21"
+path_map_folder: ""
+copy_local_map_folder: false

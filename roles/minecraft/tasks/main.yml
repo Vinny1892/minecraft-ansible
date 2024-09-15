@@ -63,7 +63,7 @@
 
 ## Add map exists, if path for passed in ansible
 - name: Copy map to server
-  when: map_folder_exists.stat.exists
+  when: map_folder_exists.stat.exists and copy_local_map_folder == true
   copy:
     src: "{{ path_map_folder }}"
     dest: "/opt/minecraft/world"
@@ -86,7 +86,7 @@
   notify:  Start Minecraft service
 
 - name: Create Minecraft server systemd service
-  when: not result.stat.exists
+  when: not map_folder_exists.stat.exists
   become: true
   template:
     src: minecraft.service.j2
