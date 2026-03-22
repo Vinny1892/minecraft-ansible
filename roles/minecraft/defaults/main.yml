@@ -11,3 +11,7 @@ copy_local_map_folder: false
 
 path_mods_folder: ""
 copy_local_mods: false
+
+# Slugs do Modrinth para download automático de mods
+# Exemplo: ["jei", "create", "waystones"]
+modrinth_mods: []

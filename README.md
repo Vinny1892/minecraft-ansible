@@ -59,12 +59,16 @@ make install_production
 
 ## Variáveis da Role
 
-Definidas em `roles/minecraft/vars/main.yml`:
+Definidas em `roles/minecraft/defaults/main.yml` — todas podem ser sobrescritas por inventário ou `-e`:
 
 | Variável | Padrão | Descrição |
 |---|---|---|
-| `jdk_version` | `"21"` | Versão do OpenJDK a instalar |
-| `minecraft_server_url_for_download` | URL Mojang 1.19.3+ | URL do JAR oficial do servidor |
+| `minecraft_version` | `"1.21.1"` | Versão do Minecraft |
+| `forge_version` | `"52.0.16"` | Versão do Forge |
+| `jdk_version` | `"21"` | Versão do OpenJDK |
+| `minecraft_xmx` | `"1024M"` | Heap máximo da JVM |
+| `minecraft_xms` | `"1024M"` | Heap inicial da JVM |
+| `modrinth_mods` | `[]` | Slugs do Modrinth para download automático de mods |
 | `path_map_folder` | `""` | Caminho local de um world map a importar |
 | `copy_local_map_folder` | `false` | Habilita importação do world map |
 
@@ -77,6 +81,16 @@ ansible-playbook -i inventories/docker.yaml playbooks/minecraft.yaml \
 ```
 
 > O world map existente em `/opt/minecraft/world` é automaticamente copiado para `/opt/minecraft_maps/world-{timestamp}` antes de cada deploy.
+
+## Mods
+
+```bash
+# Instalar mods via Modrinth automaticamente
+ansible-playbook -i inventories/docker.yaml playbooks/minecraft.yaml \
+  -e '{"modrinth_mods": ["jei", "create", "waystones"]}'
+```
+
+Veja [`docs/mods.md`](docs/mods.md) para instruções completas, incluindo uso de pasta local e os dois métodos combinados.
 
 ---
 
@@ -95,6 +109,7 @@ O pipeline Molecule cria um container Ubuntu 22.04 com systemd, aplica a role e 
 
 - [`docs/onboarding.md`](docs/onboarding.md) — guia passo a passo para novos contribuidores
 - [`docs/arquitetura.md`](docs/arquitetura.md) — deep-dive arquitetural com diagramas e análise de decisões de design
+- [`docs/mods.md`](docs/mods.md) — como instalar mods via Modrinth ou pasta local
 
 ---
 

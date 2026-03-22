@@ -85,6 +85,24 @@
     group: root
     mode: '0755'
 
+- name: Get mod info from Modrinth
+  when: modrinth_mods | length > 0
+  ansible.builtin.uri:
+    url: "https://api.modrinth.com/v2/project/{{ item }}/version?loaders=[\"forge\"]&game_versions=[\"{{ minecraft_version }}\"]"
+    return_content: true
+  register: modrinth_results
+  loop: "{{ modrinth_mods }}"
+
+- name: Download mods from Modrinth
+  when: modrinth_mods | length > 0
+  ansible.builtin.get_url:
+    url: "{{ (item.json | first).files | selectattr('primary', 'equalto', true) | first | json_query('url') }}"
+    dest: "/opt/minecraft/mods/{{ (item.json | first).files | selectattr('primary', 'equalto', true) | first | json_query('filename') }}"
+    mode: "0644"
+  loop: "{{ modrinth_results.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
 - name: Creating a eula file
   copy:
     dest: "/opt/minecraft/eula.txt"
