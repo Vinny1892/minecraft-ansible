@@ -1,38 +1,103 @@
-anRole Name
-=========
+# minecraft-ansible
 
-A brief description of the role goes here.
+Automação Ansible para deploy e gerenciamento de servidor **Minecraft Java Edition** em múltiplos ambientes: Docker local, VM e AWS EC2.
 
-Requirements
-------------
+---
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Requisitos
 
-Role Variables
---------------
+| Ferramenta | Versão |
+|---|---|
+| Python | 3.10+ |
+| Poetry | qualquer |
+| Docker | qualquer (testes locais) |
+| Ansible | ^7.2.0 (instalado via Poetry) |
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Para deploy em **AWS EC2**: instância com SSM Agent + role IAM `AmazonSSMManagedInstanceCore`. Não é necessário expor a porta 22.
 
-Dependencies
-------------
+---
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Setup
 
-Example Playbook
-----------------
+```bash
+poetry install   # instala Ansible, Molecule e dependências
+poetry shell     # ativa o virtualenv
+```
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+---
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+## Deploy
 
-License
--------
+### Docker (desenvolvimento local)
 
-BSD
+```bash
+make setup   # constrói imagem e sobe container
+make check   # verifica conectividade
+make exec    # executa o playbook
+```
 
-Author Information
-------------------
+### VM local
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```bash
+cp envs/env_vm.example.yml envs/env_vm.yml
+# preencha: host, user, path_ssh_private_key, password_user_sudo
+
+ansible-playbook -i inventories/inventory_vm.yml playbooks/minecraft.yaml
+```
+
+### AWS EC2
+
+```bash
+cp envs/env_aws.example.yml envs/env_aws.yml
+# preencha: ansible_aws_ssm_bucket_name, ansible_aws_ssm_region
+
+export AWS_PROFILE=seu-profile
+make install_production
+```
+
+---
+
+## Variáveis da Role
+
+Definidas em `roles/minecraft/vars/main.yml`:
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `jdk_version` | `"21"` | Versão do OpenJDK a instalar |
+| `minecraft_server_url_for_download` | URL Mojang 1.19.3+ | URL do JAR oficial do servidor |
+| `path_map_folder` | `""` | Caminho local de um world map a importar |
+| `copy_local_map_folder` | `false` | Habilita importação do world map |
+
+Para importar um world map existente:
+
+```bash
+ansible-playbook -i inventories/docker.yaml playbooks/minecraft.yaml \
+  -e copy_local_map_folder=true \
+  -e path_map_folder=/caminho/para/world/
+```
+
+> O world map existente em `/opt/minecraft/world` é automaticamente copiado para `/opt/minecraft_maps/world-{timestamp}` antes de cada deploy.
+
+---
+
+## Testes
+
+```bash
+make test
+# equivalente a: cd roles/minecraft && molecule test
+```
+
+O pipeline Molecule cria um container Ubuntu 22.04 com systemd, aplica a role e verifica que a porta `25565` está escutando.
+
+---
+
+## Documentação
+
+- [`docs/onboarding.md`](docs/onboarding.md) — guia passo a passo para novos contribuidores
+- [`docs/arquitetura.md`](docs/arquitetura.md) — deep-dive arquitetural com diagramas e análise de decisões de design
+
+---
+
+## Licença
+
+MIT — DiegoBulhoes
