@@ -71,24 +71,57 @@
     group: root
     mode: '0755'
 
+- name: Creates mods directory
+  file:
+    path: /opt/minecraft/mods
+    state: directory
+
+- name: Copy mods to server
+  when: copy_local_mods | bool and path_mods_folder | length > 0
+  copy:
+    src: "{{ path_mods_folder }}"
+    dest: "/opt/minecraft/mods/"
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Creating a eula file
   copy:
     dest: "/opt/minecraft/eula.txt"
     content: |
       eula=true
 
-- name: Download and extract Minecraft server
+- name: Download Forge installer
   become: true
   get_url:
-    url: "{{ minecraft_server_url_for_download  }}"
-    dest: /opt/minecraft/server.jar
+    url: "{{ forge_installer_url }}"
+    dest: "/opt/minecraft/{{ forge_installer_jar }}"
     mode: "u=rwx,g=rx,o=rx"
-  notify:  Start Minecraft service
+
+- name: Run Forge installer
+  become: true
+  command:
+    cmd: "java -jar {{ forge_installer_jar }} --installServer"
+    chdir: /opt/minecraft
+    creates: /opt/minecraft/libraries
+  notify: Start Minecraft service
+
+- name: Create user_jvm_args.txt
+  become: true
+  copy:
+    dest: "/opt/minecraft/user_jvm_args.txt"
+    content: |
+      -Xmx{{ minecraft_xmx }}
+      -Xms{{ minecraft_xms }}
+
+- name: Remove Forge installer
+  file:
+    path: "/opt/minecraft/{{ forge_installer_jar }}"
+    state: absent
 
 - name: Create Minecraft server systemd service
-  when: not map_folder_exists.stat.exists
   become: true
   template:
     src: minecraft.service.j2
     dest: /etc/systemd/system/minecraft.service
-  notify:  Start Minecraft service
+  notify: Start Minecraft service

@@ -1,11 +1,11 @@
 [Unit]
-Description=Minecraft server
+Description=Minecraft Forge server
 After=network.target
 
 [Service]
 User=root
 WorkingDirectory=/opt/minecraft
-ExecStart=/usr/bin/java -Xmx1024M -Xms1024M -jar /opt/minecraft/server.jar nogui
+ExecStart=/usr/bin/java @user_jvm_args.txt @{{ forge_unix_args }} nogui
 Restart=on-failure
 
 [Install]

@@ -1,4 +1,13 @@
 ---
-minecraft_version: "1.19.3"
+minecraft_version: "1.21.1"
+forge_version: "52.0.16"
+jdk_version: "21"
 
-teste: "seila"
+minecraft_xmx: "1024M"
+minecraft_xms: "1024M"
+
+path_map_folder: ""
+copy_local_map_folder: false
+
+path_mods_folder: ""
+copy_local_mods: false
